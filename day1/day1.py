@@ -1,7 +1,8 @@
+from time import time
 # Part 1
 r=0
 x=50
-with open("input1.txt") as ifile:
+with open("input.txt") as ifile:
     for line in ifile:
         d=line[0]
         n=int(line[1:])
@@ -16,9 +17,10 @@ with open("input1.txt") as ifile:
 print("p1: ",r)
 
 # Part 2
+s=time()
 r=0
 x=50
-with open("input1.txt") as ifile:
+with open("input.txt") as ifile:
     for line in ifile:
         d=line[0]
         n=int(line[1:])
@@ -38,3 +40,4 @@ with open("input1.txt") as ifile:
                     if x==0:
                         r+=1
 print("p2: ",r)
+print(time()-s)
