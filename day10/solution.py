@@ -43,7 +43,16 @@ print(r)
 
 print("P2")
 r=0
-import heapq
+# Little bit cheaty to use linprog function
+
+# Idea came from having a function approach:
+# For example line 1 of test input you could write as:
+# a(x+z+w) + b(y+w) + c(z+w) + d(x+y+z) + e(x) = 31x+4y+31z+29w
+# Where x,y,z,w are irrelevant and we want to solve for a,b,c,d,e (times we press each button) so that the sum of them is the smallest
+# and whole integers -> linear algebra solving in python can be done usint linprog from scipy =D
+
+from scipy.optimize import linprog
+
 with open("input.txt") as ifile:
     for line in ifile:
         checked=set()
@@ -57,40 +66,17 @@ with open("input.txt") as ifile:
         power=list(map(int,pow[:-2].split(",")))
         print(lights,buttons,power)
 
-        state=[0 for _ in range(len(power))]
-#        print(state)
-        to_test=[]
-        for button in buttons:
-            checked.add((tuple(state)))
-            heapq.heappush(to_test,(0,state.copy(),button,0))
-#        print(to_test)
-        print(state,power)
-        while True:
-#            print(highest_key)
-#            print(to_test)
-#            print(checked)
-            score,s,bu,n = heapq.heappop(to_test)
-#            print(s,bu,n,hist)
-#            print(score)
-            overflow=False
-            new_s=list(s)
-            for i in bu:
-                if (new_s[i]+1)> power[i]:
-                    overflow=True
-                new_s[i]+=1
-            if overflow:
-                continue
-            n+=1
-            tup_s=tuple(new_s)
-            if new_s == power:
-                break
-            else:
-                total_score=-sum(new_s)
-#                print(total_score)
-                if tup_s not in checked:
-                    for button in buttons:
-                            checked.add(tup_s)
-                            heapq.heappush(to_test,(total_score/n,new_s,button,n))
-#        print("fewest=",n)
-        r+=n
+        state=[[0 for _ in range(len(buttons))] for _ in range(len(power))]
+
+        for i,button in enumerate(buttons):
+            for p in button:
+                state[p][i]=1
+        print("matrix:",state)
+        print(power)
+        bounds = [(0, None) for _ in range(len(buttons))]
+
+        c = [1 for _ in range(len(buttons))]
+        res = linprog(c, A_eq=state, b_eq=power, bounds=bounds, method='highs', integrality=1)
+        print(res.fun)
+        r+=res.fun
 print(r)
